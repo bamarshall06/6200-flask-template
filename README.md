@@ -1,24 +1,25 @@
 # Flask Kit — DATA 6200
 
-The Flask kit for **DATA 6200**. Your site stops being a folder of HTML files
-and becomes a Python program that decides what each page says and hands the
-browser finished HTML.
+The Flask kit for **DATA 6200**, and the starting point for the one project you
+build all semester. It is a working website from the first minute: a Python
+program that decides what each page says and hands the browser finished HTML.
 
-Same site, same URL, same port. You are replacing the machinery behind it.
+You start using it in **HTML + the Pipeline**, before any of it is explained.
+**Flask + Routes** is where it gets explained.
 
-## Read this first: do not "Use this template"
+## Read this first: use this template once, in Module 6
 
-This repository is a GitHub template, which normally means clicking **Use this
-template** and getting a brand new repository. **Do not do that.**
+In **HTML + the Pipeline** you click the green **Use this template** button at
+the top of this page and create **one private repository** named
+`lastname-6200-project-06`. That repository is yours for the whole course.
 
-You keep **one repository, one app, one port and one database** for this whole
-course, and that repository already has your work in it — graded work, from
-**HTML + the Pipeline** onward. A new repository would leave it behind.
+**Click it once and never again.** You keep **one repository, one app, one port
+and one database** from October to December. Making a second repository later
+would strand your graded work and your live site in the first one — so if
+anything tells you to use this template again, it is out of date.
 
-So this is a **migration**: you bring this kit's structure into the project you
-already have. **Flask + Routes**, Lesson 3 walks you through it and gives you
-the prompt to hand Claude Code. What you need from here is the shape of the
-thing, which is below.
+By **Flask + Routes** this kit is already in the repository you have been
+deploying for a week. There is nothing to install and nothing to migrate.
 
 ## One of everything, for the whole course
 
@@ -27,7 +28,7 @@ thing, which is below.
 | Dokku app | **one** | Made for you. Find its name on **Deployments** in the course sidebar |
 | Port | **one** | Assigned to you. Also on **Deployments** |
 | MySQL database | **one** | Made *with* your app, carrying the same name |
-| GitHub repo | **one** | The one you created in **HTML + the Pipeline** |
+| GitHub repo | **one** | Created from this template in **HTML + the Pipeline** |
 
 This is different from the undergraduate sections, and it is deliberate: the
 project you deploy this week is the same project you are still deploying in

@@ -24,9 +24,11 @@ time this kit is in use.
 - **Never run or suggest `apps:create`.** The app was created for them. Its
   name is on the **Deployments** page in the course sidebar, and in
   `my-server.json`.
-- **Never suggest "Use this template"** to make a new repository. They keep the
-  repository they have, which already holds graded work. This kit arrives by
-  *migration* into that repository — see **Flask + Routes**, Lesson 3.
+- **Never suggest "Use this template"** after Module 6. The student's repository
+  was created from this kit once, in **HTML + the Pipeline**, and holds graded
+  work and the history behind their live site. A second repository strands both.
+  If this kit's files are already present — and in a student's repo they always
+  are — there is nothing to install and nothing to migrate.
 - **Never create a database.** It was created together with the app and carries
   the same name with dashes turned into underscores.
 - The app name is the student's netid with dots turned into dashes, plus
