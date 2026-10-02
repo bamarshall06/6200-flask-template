@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}No database yet{% endblock %}
+
+{% block content %}
+<h1>No database yet</h1>
+
+<div class="alert alert-info">
+    <p class="mb-2"><strong>Nothing is broken.</strong> This page needs a database, and one has not been set up for this project yet.</p>
+    <p class="mb-0">Your database arrives in Database + SQL. Until then, every other page on the site works normally.</p>
+</div>
+
+<h2 class="h5 mt-4">When you do have one</h2>
+
+<p>Working on your own computer, put it in a file called <code>.env</code>:</p>
+<pre class="bg-light p-3"><code>DATABASE_URL=mysql://username:password@host:3306/database_name</code></pre>
+
+<p>On the class server, set it on your app:</p>
+<pre class="bg-light p-3"><code>ssh dokku@iscs2.gcsu.edu config:set your-app-name DATABASE_URL=mysql://username:password@host:3306/database_name</code></pre>
+
+<p class="text-muted"><small>{{ message }}</small></p>
+{% endblock %}

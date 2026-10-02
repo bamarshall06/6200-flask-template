@@ -1,0 +1,193 @@
+# CI for the template itself.
+#
+# 6200 students MIGRATE this kit into the repo they already have, so this file
+# gets copied into their repo the same way "Use this template" would. Every job
+# carries a guard that makes the whole workflow a silent no-op there. Without
+# it, 30-odd private repos each burn Actions minutes on a MySQL container and
+# show their owner a red X they did not cause.
+#
+# The guard names THIS repo. If this file is ever copied to a new template
+# repo, that string has to change with it or the new repo tests nothing while
+# reporting green.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  boot:
+    name: Runs with no configuration
+    if: github.repository == 'bamarshall06/6200-flask-template'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.5'
+      - run: pip install -r requirements.txt
+      - name: Import with an empty environment
+        run: python -c "import app"
+      - name: Every page answers, and /examples explains itself
+        run: |
+          python - <<'PY'
+          import app
+          c = app.app.test_client()
+          got = {p: c.get(p).status_code for p in ('/', '/about', '/examples', '/healthz', '/nope')}
+          print(got)
+          expected = {'/': 200, '/about': 200, '/examples': 503, '/healthz': 200, '/nope': 404}
+          assert got == expected, f"expected {expected}, got {got}"
+          body = c.get('/examples').get_data(as_text=True)
+          assert 'DATABASE_URL' in body, "the no-database page must name DATABASE_URL"
+          assert c.get('/healthz').get_json()['database'] is False
+          PY
+      - name: Gunicorn config is valid
+        run: gunicorn --check-config app:app
+
+  db:
+    name: Works against a real MySQL
+    if: github.repository == 'bamarshall06/6200-flask-template'
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.5'
+      - run: pip install -r requirements.txt
+      - name: Load the schema and the seed rows
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot test < database/schema.sql
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot test < database/seed_data.sql
+      - name: CRUD against the real driver
+        env:
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/test
+        run: |
+          python - <<'PY'
+          import app
+          c = app.app.test_client()
+          r = c.get('/examples')
+          assert r.status_code == 200, r.status_code
+          assert 'First example' in r.get_data(as_text=True)
+          assert c.get('/healthz').get_json()['database'] is True
+          c.post('/examples/add', data={'name': 'ci row', 'description': 'added by CI'},
+                 follow_redirects=True)
+          assert 'ci row' in c.get('/examples').get_data(as_text=True)
+          PY
+
+  contract:
+    name: Still matches what the lessons say
+    if: github.repository == 'bamarshall06/6200-flask-template'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: The lines the course quotes verbatim
+        run: |
+          set -e
+          grep -q 'navbar navbar-expand-lg navbar-dark bg-dark' templates/base.html
+          test "$(grep -c 'bootstrap@5.3.0' templates/base.html)" -eq 2
+          test "$(cat Procfile)" = "web: gunicorn app:app"
+          grep -q '^gunicorn==' requirements.txt
+          grep -q 'examples_bp = Blueprint' blueprints/examples.py
+          grep -q '^python-3.12.5$' runtime.txt
+          echo "all contract checks passed"
+
+  server-card:
+    name: check_server.py catches what it claims to
+    if: github.repository == 'bamarshall06/6200-flask-template'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.5'
+      - name: my-server.json shipped here is valid JSON and is NOT filled in
+        run: |
+          python - <<'PY'
+          import json
+          cfg = json.load(open('my-server.json'))
+          for key in ('netid', 'app_name', 'live_url', 'port'):
+              assert not cfg[key], f"{key} ships filled in - it must be blank"
+          assert cfg['database']['host'] == '172.17.0.1'
+          assert cfg['_example']['app_name'] == 'sam-rivers-6200'
+          PY
+      - name: an unfilled card fails, and says what is missing
+        run: |
+          set +e
+          out=$(python check_server.py --offline); rc=$?
+          set -e
+          echo "$out"
+          test $rc -ne 0 || { echo "FAIL: unfilled card should exit non-zero"; exit 1; }
+          echo "$out" | grep -q 'still empty' || { echo "FAIL: should name the empty fields"; exit 1; }
+      - name: a correct card passes every offline check
+        run: |
+          mkdir -p /tmp/ok && cp check_server.py /tmp/ok/
+          cat > /tmp/ok/my-server.json <<'JSON'
+          {
+            "netid": "sam.rivers",
+            "app_name": "sam-rivers-6200",
+            "live_url": "https://iscs2.gcsu.edu:7210",
+            "port": 7210,
+            "github_repo": "https://github.com/sam-rivers/p",
+            "dokku_remote": "dokku@iscs2.gcsu.edu:sam-rivers-6200",
+            "database": {"name": "sam_rivers_6200", "username": "sam_rivers_6200",
+                         "host": "172.17.0.1", "port": 3306}
+          }
+          JSON
+          cd /tmp/ok
+          git init -q . && git remote add origin https://github.com/sam-rivers/p
+          git remote add dokku dokku@iscs2.gcsu.edu:sam-rivers-6200
+          python check_server.py --offline
+      - name: a password in the card fails, and the password is never printed
+        run: |
+          mkdir -p /tmp/bad && cp check_server.py /tmp/bad/
+          cat > /tmp/bad/my-server.json <<'JSON'
+          {
+            "netid": "sam.rivers",
+            "app_name": "sam-rivers-6200",
+            "live_url": "https://iscs2.gcsu.edu:7210",
+            "port": 7210,
+            "github_repo": "https://github.com/sam-rivers/p",
+            "dokku_remote": "dokku@iscs2.gcsu.edu:sam-rivers-6200",
+            "database": {"name": "sam_rivers_6200", "username": "sam_rivers_6200",
+                         "host": "172.17.0.1", "port": 3306,
+                         "password": "hunter2-NEVER-PRINT-ME"}
+          }
+          JSON
+          cd /tmp/bad
+          set +e
+          out=$(python check_server.py --offline); rc=$?
+          set -e
+          echo "$out"
+          test $rc -ne 0 || { echo "FAIL: a password in the card must fail"; exit 1; }
+          echo "$out" | grep -q 'no password or connection string' \
+            || { echo "FAIL: should name the secret check"; exit 1; }
+          if echo "$out" | grep -q 'hunter2-NEVER-PRINT-ME'; then
+            echo "FAIL: the checker echoed the secret it was complaining about"; exit 1
+          fi
+      - name: a .env that disagrees is reported, without echoing the password
+        run: |
+          mkdir -p /tmp/env && cp check_server.py /tmp/env/
+          cp /tmp/ok/my-server.json /tmp/env/
+          echo 'DATABASE_URL=mysql://root:LEAKY_PASSWORD@localhost:3306/wrong' > /tmp/env/.env
+          cd /tmp/env
+          set +e
+          out=$(python check_server.py --offline); rc=$?
+          set -e
+          echo "$out"
+          echo "$out" | grep -q '.env agrees with this file' || { echo "FAIL: no .env line"; exit 1; }
+          if echo "$out" | grep -q 'LEAKY_PASSWORD'; then
+            echo "FAIL: the checker printed a password out of .env"; exit 1
+          fi

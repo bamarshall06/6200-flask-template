@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Something went wrong{% endblock %}
+
+{% block content %}
+<h1>500 - Something went wrong</h1>
+<p class="lead">The server hit an error while building this page.</p>
+<p>
+    Running locally, the details are in the terminal where you started the app.
+    On the class server, read them with:
+</p>
+<pre class="bg-light p-3"><code>ssh dokku@iscs2.gcsu.edu logs your-app-name</code></pre>
+<a class="btn btn-primary" href="{{ url_for('index') }}">Back to home</a>
+{% endblock %}

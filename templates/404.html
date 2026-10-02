@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found{% endblock %}
+
+{% block content %}
+<h1>404 - Page not found</h1>
+<p class="lead">There is no page at that address.</p>
+<p>If you expected one, check that the route exists in <code>app.py</code> and that the spelling matches.</p>
+<a class="btn btn-primary" href="{{ url_for('index') }}">Back to home</a>
+{% endblock %}

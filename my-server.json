@@ -1,0 +1,56 @@
+{
+  "_comment": [
+    "Your server information for DATA 6200. You get ONE app, ONE port and ONE",
+    "database for the whole course, so this is where they get written down once",
+    "and stay written down. Every value comes off the Deployments page in the",
+    "course sidebar.",
+    "",
+    "THIS FILE IS COMMITTED, and that is safe: every value in it is already",
+    "public. Your port is in your URL, your database name is in your logs.",
+    "",
+    "THE DATABASE PASSWORD IS NOT IN HERE AND MUST NEVER BE ADDED. It goes two",
+    "places, neither of them a file git tracks: .env on your laptop (which",
+    ".gitignore blocks) and config:set on the server. That split is the whole",
+    "lesson of Database + SQL - the NAME of a secret lives in your code, the",
+    "VALUE lives somewhere the code can reach and the repository cannot.",
+    "",
+    "Check your answers against the real server with:  python check_server.py"
+  ],
+
+  "netid": "",
+  "app_name": "",
+  "live_url": "",
+  "port": null,
+  "github_repo": "",
+  "dokku_remote": "",
+
+  "database": {
+    "name": "",
+    "username": "",
+    "host": "172.17.0.1",
+    "port": 3306
+  },
+
+  "_example": {
+    "_comment": [
+      "What a filled-in file looks like, for a student whose netid is",
+      "sam.rivers and whose port is 7210. Yours will have a different port.",
+      "Note how little of this you actually choose: the app name is your netid",
+      "with dots turned into dashes, the database name is the app name with",
+      "dashes turned into underscores, and the username is the database name.",
+      "Only the port is assigned to you."
+    ],
+    "netid": "sam.rivers",
+    "app_name": "sam-rivers-6200",
+    "live_url": "https://iscs2.gcsu.edu:7210",
+    "port": 7210,
+    "github_repo": "https://github.com/sam-rivers/data-6200-project",
+    "dokku_remote": "dokku@iscs2.gcsu.edu:sam-rivers-6200",
+    "database": {
+      "name": "sam_rivers_6200",
+      "username": "sam_rivers_6200",
+      "host": "172.17.0.1",
+      "port": 3306
+    }
+  }
+}

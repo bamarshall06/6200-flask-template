@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Examples{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Examples</h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">Add</button>
+</div>
+
+<p class="text-muted">
+    Every row below is a row in the <code>examples</code> table. Add, edit and
+    delete all write to the database.
+</p>
+
+{% if examples %}
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Created</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for example in examples %}
+        <tr>
+            <td>{{ example.name }}</td>
+            <td>{{ example.description }}</td>
+            <td>{{ example.created_at }}</td>
+            <td class="text-end">
+                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal{{ example.id }}">Edit</button>
+                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ example.id }}">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-secondary">
+    No rows yet. If you have not loaded <code>database/schema.sql</code> and
+    <code>database/seed_data.sql</code> into your database, do that first.
+</div>
+{% endif %}
+
+<!-- Add -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" method="POST" action="{{ url_for('examples.add_example') }}">
+            <div class="modal-header">
+                <h5 class="modal-title">Add an example</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label" for="add-name">Name</label>
+                    <input class="form-control" id="add-name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="add-description">Description</label>
+                    <textarea class="form-control" id="add-description" name="description" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% for example in examples %}
+<!-- Edit {{ example.id }} -->
+<div class="modal fade" id="editModal{{ example.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" method="POST" action="{{ url_for('examples.edit_example', example_id=example.id) }}">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label" for="edit-name-{{ example.id }}">Name</label>
+                    <input class="form-control" id="edit-name-{{ example.id }}" name="name" value="{{ example.name }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="edit-description-{{ example.id }}">Description</label>
+                    <textarea class="form-control" id="edit-description-{{ example.id }}" name="description" rows="3">{{ example.description }}</textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete {{ example.id }} -->
+<div class="modal fade" id="deleteModal{{ example.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" method="POST" action="{{ url_for('examples.delete_example', example_id=example.id) }}">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete this row?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Delete <strong>{{ example.name }}</strong>? This cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
