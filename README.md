@@ -128,11 +128,61 @@ alone until **Database + SQL**.
 | `Procfile`, `gunicorn.conf.py`, `runtime.txt` | How the class server runs your app. Leave these alone |
 | `CLAUDE.md` | The rules Claude Code follows in this project. Worth reading once |
 | `.env.example`, `database/`, `blueprints/examples.py` | *Database + SQL onward.* Not used yet |
+| `database/schema.md` | **Why your schema is shaped that way.** Graded in *Database + SQL* |
+| `docs/aws.md`, `docs/security.md` | **Your deploy write-up and your security report.** Graded in *Deploy & Secure* |
+| `analysis/` | **Your script, chart and findings.** Graded in *Python + Big Data* |
 
 A route and a template are two halves of one page. `app.py` decides *what* the
 page says; the template in `templates/` decides *how it looks*. Change the
 wrong half and nothing happens — that is the most common confusion in this
 project, after the venv.
+
+## How it works
+
+**This section is graded, and it is yours to write.** *Flask + Routes* reads it
+for **"Traces one request end to end"**, and *Database + SQL* reads it for the
+full browser-to-response chain and for your proof the page is really
+data-backed.
+
+Replace all of it. Write it for someone who has never seen this project — being
+able to do that is the difference between understanding what you built and
+having assembled it.
+
+### One request, traced
+
+A visitor types `TODO`, and then what?
+
+| Step | What happens here |
+|---|---|
+| The URL | `TODO` |
+| The route that matched | `TODO` in `app.py` |
+| The function that ran | `TODO` |
+| The template it rendered | `templates/TODO` |
+| One value Python put in | `TODO` |
+
+### The database chain *(Database + SQL onward)*
+
+Browser → route → query → response, named at each step. TODO
+
+### Proof it is really data-backed
+
+**Which row you changed, and what changed on the page as a result — with no code
+edit.** This is the criterion people most often assert instead of showing, so
+show it.
+
+TODO
+
+## Configuration
+
+**Names, never values.** Every variable this project reads, and where its value
+actually lives — which is never this repository.
+
+| Variable | What it is | Where the value lives |
+|---|---|---|
+| `DATABASE_URL` | The connection string for your MySQL database | your gitignored `.env` locally, and `config:set` on the server |
+
+Your database password goes in exactly those two places. **If it is in a file
+git tracks, rotate it with `mysql:rotate` before you do anything else.**
 
 ## Deploying
 

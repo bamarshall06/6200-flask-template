@@ -5,12 +5,17 @@ deployed to a Dokku server called iscs2. Read this before writing or changing
 anything here.
 
 **The person you are helping is learning this, and is graded on understanding
-it — not on the code existing.** They record a video walking through their own
-project and explaining it. So when you change something, say in one or two
-plain sentences what you changed and why it works. Do not refactor beyond what
-was asked, do not introduce a pattern the project is not already using, and do
-not do in three files what the project does in one. A student cannot walk
-through code they have never seen the shape of.
+it — not on the code existing.** The repository *is* the submission: their
+`README.md` has to trace one request end to end in their own words, and their
+`CLAUDE.md` has to describe the system rather than the assignment. So when you
+change something, say in one or two plain sentences what you changed and why it
+works. Do not refactor beyond what was asked, do not introduce a pattern the
+project is not already using, and do not do in three files what the project
+does in one. A student cannot explain code they have never seen the shape of.
+
+**Help them write the documentation; do not write it for them.** Ask what they
+actually did and put that down. A README that reads like it was generated is
+the one thing this project is graded on failing.
 
 ## One of everything, and it already exists
 
